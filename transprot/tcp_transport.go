@@ -3,7 +3,9 @@ package transprot
 import (
 	"bufio"
 	"encoding/gob"
+	"fmt"
 	"net"
+	"time"
 )
 
 type tcpTransport struct {
@@ -18,8 +20,17 @@ func (t *tcpTransport) Dial(addr string, opts ...DialOption) (Client, error) {
 	if err != nil {
 		return nil, err
 	}
+	if tcpConn, ok := conn.(*net.TCPConn); ok {
+		if err := tcpConn.SetKeepAlive(true); err != nil {
+			return nil, err
+		}
+		if err := tcpConn.SetKeepAlivePeriod(20 * time.Second); err != nil {
+			return nil, err
+		}
+	} else {
+		fmt.Println("not tcp conn")
+	}
 	buf := bufio.NewWriter(conn)
-
 	return &tcpTransportClient{
 		conn:     conn,
 		buf:      buf,
