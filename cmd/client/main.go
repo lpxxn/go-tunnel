@@ -10,7 +10,7 @@ import (
 func main() {
 	tcpTransport := transport.NewTcpTransport()
 	client, err := tcpTransport.Dial("127.0.0.1:7891", func(options *transport.DialOptions) {
-		options.Timeout = time.Second * 5
+		options.Timeout = time.Second * 15
 	})
 	if err != nil {
 		panic(err)

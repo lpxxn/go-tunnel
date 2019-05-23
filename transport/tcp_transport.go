@@ -2,8 +2,8 @@ package transport
 
 import (
 	"bufio"
+	"context"
 	"encoding/gob"
-	"fmt"
 	"net"
 	"time"
 )
@@ -11,24 +11,26 @@ import (
 type tcpTransport struct {
 }
 
+var defaultDial = &net.Dialer{KeepAlive: time.Second * 10}
+
 func (t *tcpTransport) Dial(addr string, opts ...DialOption) (Client, error) {
-	var dialOpts DialOptions
+	dialOpts := DialOptions{
+		Timeout: defaultTimeout,
+	}
 	for _, v := range opts {
 		v(&dialOpts)
 	}
-	conn, err := net.DialTimeout("tcp", addr, dialOpts.Timeout)
+	ctx := context.Background()
+	var cancel context.CancelFunc
+	if dialOpts.Timeout >= 0 {
+		ctx, cancel = context.WithTimeout(ctx, dialOpts.Timeout)
+	}
+	conn, err := defaultDial.DialContext(ctx, "tcp", addr)
+	if cancel != nil {
+		cancel()
+	}
 	if err != nil {
 		return nil, err
-	}
-	if tcpConn, ok := conn.(*net.TCPConn); ok {
-		if err := tcpConn.SetKeepAlive(true); err != nil {
-			return nil, err
-		}
-		if err := tcpConn.SetKeepAlivePeriod(20 * time.Second); err != nil {
-			return nil, err
-		}
-	} else {
-		fmt.Println("not tcp conn")
 	}
 	buf := bufio.NewWriter(conn)
 	return &tcpTransportClient{

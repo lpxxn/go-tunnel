@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+var defaultTimeout = time.Second * 15
+
 type DialOptions struct {
 	Timeout time.Duration
 	Context context.Context
