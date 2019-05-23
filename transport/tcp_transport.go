@@ -1,4 +1,4 @@
-package transprot
+package transport
 
 import (
 	"bufio"
@@ -59,4 +59,8 @@ func (t *tcpTransport) Listen(addr string, opts ...ListenOption) (Listener, erro
 
 func (t *tcpTransport) String() string {
 	return "tcp"
+}
+
+func NewTcpTransport() *tcpTransport {
+	return &tcpTransport{}
 }
