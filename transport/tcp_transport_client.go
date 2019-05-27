@@ -17,9 +17,9 @@ type tcpTransportClient struct {
 }
 
 func (c *tcpTransportClient) Recv(msg *Msg) error {
-	if c.timeout > 0 {
-		c.conn.SetDeadline(time.Now().Add(c.timeout))
-	}
+	//if c.timeout > 0 {
+	//	c.conn.SetDeadline(time.Now().Add(c.timeout))
+	//}
 	return c.decode.Decode(msg)
 }
 

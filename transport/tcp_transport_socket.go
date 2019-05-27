@@ -16,10 +16,16 @@ type tcpTransportSocket struct {
 }
 
 func (tts *tcpTransportSocket) Recv(msg *Msg) error {
-	if tts.timeout > 0 {
-		tts.conn.SetDeadline(time.Now().Add(tts.timeout))
-	}
+	//if tts.timeout > 0 {
+	//	tts.conn.SetDeadline(time.Now().Add(tts.timeout))
+	//}
 	return tts.decode.Decode(msg)
+	//if netOPErr, ok := err.(net.Error); ok && netOPErr.Timeout() {
+	//	fmt.Println("time ")
+	//	return tts.Recv(msg)
+	//} else {
+	//	return err
+	//}
 }
 
 func (tts *tcpTransportSocket) Send(msg *Msg) error {

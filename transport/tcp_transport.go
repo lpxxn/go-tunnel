@@ -22,7 +22,7 @@ func (t *tcpTransport) Dial(addr string, opts ...DialOption) (Client, error) {
 	}
 	ctx := context.Background()
 	var cancel context.CancelFunc
-	if dialOpts.Timeout >= 0 {
+	if dialOpts.Timeout > 0 {
 		ctx, cancel = context.WithTimeout(ctx, dialOpts.Timeout)
 	}
 	conn, err := defaultDial.DialContext(ctx, "tcp", addr)

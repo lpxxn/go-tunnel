@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"net"
 	"os"
 	"os/signal"
 
@@ -16,14 +18,28 @@ func main() {
 	}
 	defer listener.Close()
 	fn := func(sock transport.Socket) {
-		defer sock.Close()
+		defer func() {
+			fmt.Println("close socket")
+			sock.Close()
+		}()
 
 		for {
 			var m transport.Msg
 			if err := sock.Recv(&m); err != nil {
+
+				if err == io.EOF {
+					fmt.Println("io.EOF")
+				}
+				if netOPErr, ok := err.(net.Error); ok {
+					if netOPErr.Timeout() {
+						fmt.Println("just timeout continue, err info: ", err)
+						continue
+					}
+				}
 				fmt.Println("socket Rev error", err)
 				return
 			}
+			fmt.Println("received: ", m)
 			if err := sock.Send(&m); err != nil {
 				fmt.Println("socket Send error", err)
 				return
