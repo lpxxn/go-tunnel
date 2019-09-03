@@ -7,7 +7,7 @@ import (
 
 type ClientInfo struct {
 	LastUpdate    int64
-	Id            string
+	Id            int64
 	RemoteAddress string `json:"remote_address"`
 	HostName      string `json:"host_name"`
 	TcpPort       int    `json:"tcp_port"`
@@ -18,9 +18,10 @@ type clientInfoList []*ClientInfo
 
 type TunnelServer struct {
 	sync.RWMutex
-	opts        Options
-	tcpListener net.Listener
-	clients     map[string]*ClientInfo
+	opts             Options
+	tcpListener      net.Listener
+	clientIDSequence int64
+	clients          map[int64]*ClientInfo
 }
 
 func NewTunnelServer(opts *Options) (*TunnelServer, error) {
@@ -36,5 +37,11 @@ func NewTunnelServer(opts *Options) (*TunnelServer, error) {
 func (t *TunnelServer) AddClient(clientInfo *ClientInfo) {
 	t.Lock()
 	t.clients[clientInfo.Id] = clientInfo
+	t.Unlock()
+}
+
+func (t *TunnelServer) RemoveClient(id int64) {
+	t.Lock()
+	delete(t.clients, id)
 	t.Unlock()
 }
